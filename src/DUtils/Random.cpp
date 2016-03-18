@@ -16,9 +16,15 @@ using namespace std;
 bool DUtils::Random::m_already_seeded = false;
 
 void DUtils::Random::SeedRand(){
-	Timestamp time;
-	time.setToCurrentTime();
-	srand((unsigned)time.getFloatTime()); 
+
+    // qiao@2016.03.18
+    // fix seed for testing
+    srand(0xcafe);
+    /*
+    Timestamp time;
+    time.setToCurrentTime();
+    srand((unsigned)time.getFloatTime()); 
+    */
 }
 
 void DUtils::Random::SeedRandOnce()
