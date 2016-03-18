@@ -5,28 +5,40 @@ option(BUILD_DUtils   "Build DUtils (basic c++ functions)." ON)
 option(BUILD_DUtilsCV "Build DUtilsCV (OpenCV functions, requires DUtils)." ON)
 option(BUILD_DVision  "Build DVision (computer vision functions, requires DUtilsCV)." ON)
 
+# force using c++11
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 if(BUILD_DUtils)
   set(HDRS include/DUtils/
-    include/DUtils/BinaryFile.h      include/DUtils/DUtils.h          include/DUtils/FileModes.h       include/DUtils/Math.hpp          
+    include/DUtils/BinaryFile.h      include/DUtils/DUtils.h          include/DUtils/FileModes.h       include/DUtils/Math.hpp
     include/DUtils/STL.h             include/DUtils/Timestamp.h
-    include/DUtils/ConfigFile.h      include/DUtils/DebugFunctions.h  include/DUtils/LUT.h             include/DUtils/Profiler.h        
+    include/DUtils/ConfigFile.h      include/DUtils/DebugFunctions.h  include/DUtils/LUT.h             include/DUtils/Profiler.h
     include/DUtils/StringFunctions.h include/DUtils/dirent_win.h
-    include/DUtils/DException.h      include/DUtils/FileFunctions.h   include/DUtils/LineFile.h        include/DUtils/Random.h          
+    include/DUtils/DException.h      include/DUtils/FileFunctions.h   include/DUtils/LineFile.h        include/DUtils/Random.h
     include/DUtils/TimeManager.h)
-  set(SRCS 
-    src/DUtils/BinaryFile.cpp      src/DUtils/DebugFunctions.cpp  src/DUtils/LUT.cpp             src/DUtils/Profiler.cpp        
+  set(SRCS
+    src/DUtils/BinaryFile.cpp      src/DUtils/DebugFunctions.cpp  src/DUtils/LUT.cpp             src/DUtils/Profiler.cpp
     src/DUtils/StringFunctions.cpp src/DUtils/Timestamp.cpp
-    src/DUtils/ConfigFile.cpp      src/DUtils/FileFunctions.cpp   src/DUtils/LineFile.cpp        src/DUtils/Random.cpp          
+    src/DUtils/ConfigFile.cpp      src/DUtils/FileFunctions.cpp   src/DUtils/LineFile.cpp        src/DUtils/Random.cpp
     src/DUtils/TimeManager.cpp)
 endif(BUILD_DUtils)
 
-if(BUILD_DUtilsCV)  
-  set(HDRS 
-    include/DUtilsCV/CvVersion.h       include/DUtilsCV/Drawing.h         include/DUtilsCV/Geometry.h        include/DUtilsCV/Mat.h             
+if(BUILD_DUtilsCV)
+  set(HDRS
+    include/DUtilsCV/CvVersion.h       include/DUtilsCV/Drawing.h         include/DUtilsCV/Geometry.h        include/DUtilsCV/Mat.h
     include/DUtilsCV/Types.h
     include/DUtilsCV/DUtilsCV.h        include/DUtilsCV/GUI.h             include/DUtilsCV/IO.h              include/DUtilsCV/Transformations.h
     ${HRDS})
-  set(SRCS 
+  set(SRCS
     src/DUtilsCV/Drawing.cpp         src/DUtilsCV/Geometry.cpp        src/DUtilsCV/Mat.cpp             src/DUtilsCV/Types.cpp
     src/DUtilsCV/GUI.cpp             src/DUtilsCV/IO.cpp              src/DUtilsCV/Transformations.cpp
     ${SRCS})
@@ -34,15 +46,15 @@ endif(BUILD_DUtilsCV)
 
 if(BUILD_DVision)
   set(HDRS
-    include/DVision/BRIEF.h          include/DVision/DVision.h        include/DVision/HSolver.h        include/DVision/Matches.h        
+    include/DVision/BRIEF.h          include/DVision/DVision.h        include/DVision/HSolver.h        include/DVision/Matches.h
     include/DVision/PMVSCamera.h     include/DVision/PixelPointFile.h
-    include/DVision/BundleCamera.h   include/DVision/FSolver.h        include/DVision/ImageFunctions.h include/DVision/PLYFile.h        
+    include/DVision/BundleCamera.h   include/DVision/FSolver.h        include/DVision/ImageFunctions.h include/DVision/PLYFile.h
     include/DVision/PatchFile.h      include/DVision/SurfSet.h
     ${HDRS})
   set(SRCS
-    src/DVision/BRIEF.cpp          src/DVision/FSolver.cpp        src/DVision/ImageFunctions.cpp src/DVision/PLYFile.cpp        
+    src/DVision/BRIEF.cpp          src/DVision/FSolver.cpp        src/DVision/ImageFunctions.cpp src/DVision/PLYFile.cpp
     src/DVision/PatchFile.cpp      src/DVision/SurfSet.cpp
-    src/DVision/BundleCamera.cpp   src/DVision/HSolver.cpp        src/DVision/Matches.cpp        src/DVision/PMVSCamera.cpp     
+    src/DVision/BundleCamera.cpp   src/DVision/HSolver.cpp        src/DVision/Matches.cpp        src/DVision/PMVSCamera.cpp
     src/DVision/PixelPointFile.cpp
     ${SRCS})
 endif(BUILD_DVision)
@@ -71,5 +83,5 @@ if(BUILD_DVision)
 endif()
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DLibConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})
-install(FILES "${PROJECT_BINARY_DIR}/DLibConfig.cmake" 
+install(FILES "${PROJECT_BINARY_DIR}/DLibConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/DLib/)

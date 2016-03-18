@@ -2,8 +2,8 @@
  * File: BRIEF.h
  * Author: Dorian Galvez-Lopez
  * Date: March 2011
- * Description: implementation of BRIEF (Binary Robust Independent 
- *   Elementary Features) descriptor by 
+ * Description: implementation of BRIEF (Binary Robust Independent
+ *   Elementary Features) descriptor by
  *   Michael Calonder, Vincent Lepetit and Pascal Fua
  *   + close binary tests (by Dorian Galvez-Lopez)
  *
@@ -31,7 +31,54 @@
 
 #include <opencv/cv.h>
 #include <vector>
-#include <boost/dynamic_bitset.hpp>
+//#include <boost/dynamic_bitset.hpp>
+#include <memory>
+#include <bitset>
+#include <string>
+#include <iostream>
+
+// create a simple class to get rid of boost
+class dyn_bitset : public std::vector<bool>
+{
+public:
+
+    dyn_bitset& operator=(const dyn_bitset& b);
+
+    inline dyn_bitset& reset()
+    {
+        std::fill(begin(), end(), false);
+    }
+
+    dyn_bitset& operator^=(const dyn_bitset& rhs)
+    {
+        assert(size() == rhs.size());
+        for (size_type i = 0; i < this->size(); ++i) {
+            (*this)[i] = (*this)[i] != rhs[i];
+        }
+        return *this;
+    }
+
+    dyn_bitset& set(std::size_t n, bool val = true)
+    {
+        (*this)[n] = val;
+    }
+
+    // FIXME: this implementation might be too much slower than boost::dynamic_bitset
+    std::size_t count()
+    {
+        size_t num = 0;
+        for(auto&& i: (*this)) {
+            num += (*this)[i]? 1 : 0;
+        }
+        return num;
+    }
+};
+
+dyn_bitset operator^(const dyn_bitset& x, const dyn_bitset& y);
+
+std::istream& operator>>(std::istream& is, dyn_bitset& b);
+
+void to_string(const dyn_bitset& b, std::string& s);
 
 namespace DVision {
 
@@ -41,7 +88,8 @@ class BRIEF
 public:
 
   /// Bitset type
-  typedef boost::dynamic_bitset<> bitset;
+  //typedef boost::dynamic_bitset<> bitset;
+  typedef dyn_bitset bitset;
 
   /// Type of pairs
   enum Type
@@ -49,18 +97,18 @@ public:
     RANDOM, // random pairs (Calonder's original version)
     RANDOM_CLOSE, // random but close pairs (used in GalvezIROS11)
   };
-  
+
 public:
 
   /**
    * Creates the BRIEF a priori data for descriptors of nbits length
    * @param nbits descriptor length in bits
-   * @param patch_size 
+   * @param patch_size
    * @param type type of pairs to generate
    */
   BRIEF(int nbits = 256, int patch_size = 48, Type type = RANDOM_CLOSE);
   virtual ~BRIEF();
-  
+
   /**
    * Returns the descriptor length in bits
    * @return descriptor length in bits
@@ -69,7 +117,7 @@ public:
   {
     return m_bit_length;
   }
-  
+
   /**
    * Returns the type of classifier
    */
@@ -77,7 +125,7 @@ public:
   {
     return m_type;
   }
-  
+
   /**
    * Returns the size of the patch
    */
@@ -85,40 +133,40 @@ public:
   {
     return m_patch_size;
   }
-  
+
   /**
    * Returns the BRIEF descriptors of the given keypoints in the given image
    * @param image
    * @param points
-   * @param descriptors 
-   * @param treat_image (default: true) if true, the image is converted to 
+   * @param descriptors
+   * @param treat_image (default: true) if true, the image is converted to
    *   grayscale if needed and smoothed. If not, it is assumed the image has
    *   been treated by the user
    * @note this function is similar to BRIEF::compute
    */
-  inline void operator() (const cv::Mat &image, 
+  inline void operator() (const cv::Mat &image,
     const std::vector<cv::KeyPoint> &points,
     std::vector<bitset> &descriptors,
     bool treat_image = true) const
   {
     compute(image, points, descriptors, treat_image);
   }
-  
+
   /**
    * Returns the BRIEF descriptors of the given keypoints in the given image
    * @param image
    * @param points
-   * @param descriptors 
-   * @param treat_image (default: true) if true, the image is converted to 
+   * @param descriptors
+   * @param treat_image (default: true) if true, the image is converted to
    *   grayscale if needed and smoothed. If not, it is assumed the image has
    *   been treated by the user
    * @note this function is similar to BRIEF::operator()
-   */ 
+   */
   void compute(const cv::Mat &image,
     const std::vector<cv::KeyPoint> &points,
     std::vector<bitset> &descriptors,
     bool treat_image = true) const;
-  
+
   /**
    * Exports the test pattern
    * @param x1 x1 coordinates of pairs
@@ -134,7 +182,7 @@ public:
     x2 = m_x2;
     y2 = m_y2;
   }
-  
+
   /**
    * Sets the test pattern
    * @param x1 x1 coordinates of pairs
@@ -142,8 +190,8 @@ public:
    * @param x2 x2 coordinates of pairs
    * @param y2 y2 coordinates of pairs
    */
-  inline void importPairs(const std::vector<int> &x1, 
-    const std::vector<int> &y1, const std::vector<int> &x2, 
+  inline void importPairs(const std::vector<int> &x1,
+    const std::vector<int> &y1, const std::vector<int> &x2,
     const std::vector<int> &y2)
   {
     m_x1 = x1;
@@ -152,7 +200,7 @@ public:
     m_y2 = y2;
     m_bit_length = x1.size();
   }
-  
+
   /**
    * Returns the Hamming distance between two descriptors
    * @param a first descriptor vector
@@ -167,11 +215,11 @@ public:
 protected:
 
   /**
-   * Generates random points in the patch coordinates, according to 
+   * Generates random points in the patch coordinates, according to
    * m_patch_size and m_bit_length
    */
   void generateTestPoints();
-  
+
 protected:
 
   /// Descriptor length in bits
@@ -179,7 +227,7 @@ protected:
 
   /// Patch size
   int m_patch_size;
-  
+
   /// Type of pairs
   Type m_type;
 
