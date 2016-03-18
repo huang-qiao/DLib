@@ -31,54 +31,12 @@
 
 #include <opencv/cv.h>
 #include <vector>
-//#include <boost/dynamic_bitset.hpp>
+#include "dynamic_bitset/dynamic_bitset.hpp"
 #include <memory>
 #include <bitset>
 #include <string>
 #include <iostream>
 
-// create a simple class to get rid of boost
-class dyn_bitset : public std::vector<bool>
-{
-public:
-
-    dyn_bitset& operator=(const dyn_bitset& b);
-
-    inline dyn_bitset& reset()
-    {
-        std::fill(begin(), end(), false);
-    }
-
-    dyn_bitset& operator^=(const dyn_bitset& rhs)
-    {
-        assert(size() == rhs.size());
-        for (size_type i = 0; i < this->size(); ++i) {
-            (*this)[i] = (*this)[i] != rhs[i];
-        }
-        return *this;
-    }
-
-    dyn_bitset& set(std::size_t n, bool val = true)
-    {
-        (*this)[n] = val;
-    }
-
-    // FIXME: this implementation might be too much slower than boost::dynamic_bitset
-    std::size_t count()
-    {
-        size_t num = 0;
-        for(auto&& i: (*this)) {
-            num += (*this)[i]? 1 : 0;
-        }
-        return num;
-    }
-};
-
-dyn_bitset operator^(const dyn_bitset& x, const dyn_bitset& y);
-
-std::istream& operator>>(std::istream& is, dyn_bitset& b);
-
-void to_string(const dyn_bitset& b, std::string& s);
 
 namespace DVision {
 
@@ -88,8 +46,7 @@ class BRIEF
 public:
 
   /// Bitset type
-  //typedef boost::dynamic_bitset<> bitset;
-  typedef dyn_bitset bitset;
+  typedef DBoost::dynamic_bitset<> bitset;
 
   /// Type of pairs
   enum Type

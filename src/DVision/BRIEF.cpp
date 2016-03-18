@@ -12,49 +12,10 @@
 
 #include "BRIEF.h"
 #include "DUtils.h"
-//#include <boost/dynamic_bitset.hpp>
 #include <vector>
 
 using namespace std;
 using namespace DVision;
-
-dyn_bitset operator^(const dyn_bitset& x, const dyn_bitset& y)
-{
-    dyn_bitset b(x);
-    return b ^= y;
-}
-
-std::istream& operator>>(std::istream& is, dyn_bitset& b)
-{
-    b.clear();
-    std::string strInput;
-    is >> strInput;
-    for(size_t i=0; i<strInput.length(); i++) {
-        switch(strInput[strInput.length()-1-i]) {
-        case '1':
-            b.push_back(true);
-            break;
-        case '0':
-            b.push_back(false);
-            break;
-        default:
-            ;
-        }
-    }
-    return is;
-}
-
-void to_string(const dyn_bitset& b, std::string& s)
-{
-    const std::size_t len = b.size();
-    s.assign(len, '0');
-    for(size_t i=0; i<len; i++) {
-        if(b[i]) {
-            s[i] = '1';
-        }
-    }
-}
-
 // ----------------------------------------------------------------------------
 
 BRIEF::BRIEF(int nbits, int patch_size, Type type):
