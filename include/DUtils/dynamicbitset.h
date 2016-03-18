@@ -1,4 +1,0 @@
-#ifndef DYNAMICBITSET_H
-#define DYNAMICBITSET_H
-
-#endif // DYNAMICBITSET_H

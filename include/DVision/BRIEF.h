@@ -31,12 +31,12 @@
 
 #include <opencv/cv.h>
 #include <vector>
-#include "dynamic_bitset/dynamic_bitset.hpp"
 #include <memory>
 #include <bitset>
 #include <string>
 #include <iostream>
 
+#include "DynamicBitset.h"
 
 namespace DVision {
 
@@ -46,7 +46,7 @@ class BRIEF
 public:
 
   /// Bitset type
-  typedef DBoost::dynamic_bitset<> bitset;
+  typedef DUtils::dynamic_bitset<> bitset;
 
   /// Type of pairs
   enum Type
