@@ -10,7 +10,7 @@
  
 #include <vector>
 #include <cmath>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include "HSolver.h"
 
 #include "DUtils.h"

@@ -13,8 +13,8 @@
 
 #include <iostream>
 #include <vector>
-#include <opencv/cv.h>
-#include <opencv2/legacy/legacy.hpp>
+#include <opencv2/opencv.hpp>
+//#include <opencv2/legacy/legacy.hpp>
 #include <string>
 
 namespace DUtilsCV
@@ -25,7 +25,7 @@ class IO
 {
 public:
 
-  /** 
+  /**
    * Saves a set of keypoints in the opencv-format
    * @param filename
    * @param keys
@@ -35,7 +35,7 @@ public:
   static void saveKeyPoints(const std::string &filename,
     const std::vector<cv::KeyPoint> &keys,
     const std::string &nodename = "keys");
-  
+
   /**
    * Loads a set of keypoints
    * @param filename
@@ -45,7 +45,7 @@ public:
   static void loadKeyPoints(const std::string &filename,
     std::vector<cv::KeyPoint> &keys,
     const std::string &nodename = "keys");
-  
+
   /**
    * Prints a mat of scalar values
    * @param m
@@ -54,7 +54,7 @@ public:
    */
   static void print(const cv::Mat &m,
     const std::string &name = "", std::ostream &f = std::cout);
-  
+
   /**
    * Prints any mat of the type given
    * @param m
@@ -62,10 +62,10 @@ public:
    * @param f stream where m is printed out
    */
   template<class T>
-  static void print(const cv::Mat &m, 
+  static void print(const cv::Mat &m,
     const std::string &name = "", std::ostream &f = std::cout);
-  
-  /** 
+
+  /**
    * Prints the size of the given matrix
    * @param m
    * @param name optional name given when printing
@@ -73,16 +73,16 @@ public:
    */
   static void printSize(const cv::Mat &m,
     const std::string &name = "", std::ostream &f = std::cout);
-  
+
   /**
    * Prints the data type of the given matrix
-   * @param m 
+   * @param m
    * @param name optional name given when printing
    * @param f stream
    */
   static void printType(const cv::Mat &m,
     const std::string &name = "", std::ostream &f = std::cout);
-  
+
   /**
    * Saves any type of data that supports the "write" function
    * @param filename
@@ -102,29 +102,32 @@ public:
   template<class T>
   static void load(const std::string &filename, T& c,
     const std::string &nodename = "data");
-  
+
+  // qiao@2016.03.19
+  /* remove dependency of <opencv2/legacy.hpp>
+
   // Save and Load functions to make calling easier
-  
-  /**
+
+   **
    * Saves a fern classifier
    * @param filename
    * @param c
    * @param nodename
-   */
-  inline static void save(const std::string &filename, 
+   *
+  inline static void save(const std::string &filename,
     const cv::FernClassifier &c,
     const std::string &nodename = "fern_classifier");
 
-  /**
+   **
    * Loads a fern classifier
    * @param filename
    * @param c
    * @param nodename
-   */
-  inline static void load(const std::string &filename, 
+   *
+  inline static void load(const std::string &filename,
     cv::FernClassifier &c,
     const std::string &nodename = "fern_classifier");
-
+  */// remove dependency of <opencv2/legacy.hpp>
 };
 
 // ---------------------------------------------------------------------------
@@ -165,9 +168,12 @@ void IO::load(const std::string &filename, T& c,
   c.read(fs[nodename]);
 }
 
+// qiao@2016.03.19
+/* remove dependency of <opencv2/legacy.hpp>
+
 // ---------------------------------------------------------------------------
 
-inline void IO::save(const std::string &filename, 
+inline void IO::save(const std::string &filename,
     const cv::FernClassifier &c,
     const std::string &nodename)
 {
@@ -176,7 +182,7 @@ inline void IO::save(const std::string &filename,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-inline void IO::load(const std::string &filename, 
+inline void IO::load(const std::string &filename,
     cv::FernClassifier &c,
     const std::string &nodename)
 {
@@ -184,6 +190,7 @@ inline void IO::load(const std::string &filename,
 }
 
 // ---------------------------------------------------------------------------
+*/// remove dependency of <opencv2/legacy.hpp>
 
 }
 

@@ -29,7 +29,7 @@
 #ifndef __D_BRIEF__
 #define __D_BRIEF__
 
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <vector>
 #include <memory>
 #include <bitset>

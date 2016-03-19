@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <vector>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <opencv/highgui.h>
 #include <string>
 #include "IO.h"

@@ -9,7 +9,7 @@
  */
 
 #include <vector>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <opencv/highgui.h>
 #include "Drawing.h"
 
@@ -18,7 +18,7 @@ using namespace DUtilsCV;
 
 // ---------------------------------------------------------------------------
 
-void Drawing::drawKeyPoints(cv::Mat &image, 
+void Drawing::drawKeyPoints(cv::Mat &image,
     const std::vector<cv::KeyPoint> &keypoints,
     bool colorOctave, bool useCartesianAngle)
 {
@@ -26,7 +26,7 @@ void Drawing::drawKeyPoints(cv::Mat &image,
     cvScalar(0, 0, 255),
     cvScalar(0, 255, 0),
     cvScalar(255, 0, 0),
-    cvScalar(255, 255, 255) 
+    cvScalar(255, 255, 255)
   };
 
   const double PI = 3.14159265;
@@ -37,25 +37,25 @@ void Drawing::drawKeyPoints(cv::Mat &image,
     //float s = ((9.0f/1.2f) * it->size/10.0f) / 3.0f;
     float s = it->size / 2.f;
     //if(s < 3.f) s = 3.f;
-    
+
     const CvScalar *color;
     if(!colorOctave || it->octave < 1 || it->octave > 3)
       color = &colors[3];
     else
       color = &colors[it->octave-1];
-    
+
     int r1 = (int)(it->pt.y + 0.5);
     int c1 = (int)(it->pt.x + 0.5);
-    
+
     cv::circle(image, cvPoint(c1, r1), (int)s, *color, 1);
-    
+
     if(it->angle >= 0)
     {
       // angle is in [0..360]
       float o = (float)(it->angle * PI / 180.);
       int c2 = (int)(s * cos(o) + it->pt.x + 0.5);
       int r2;
-      
+
       if(useCartesianAngle)
         r2 = (int)(- s * sin(o) + it->pt.y + 0.5);
       else
@@ -78,7 +78,7 @@ void Drawing::saveKeyPointImage(const std::string &filename,
 
 // ---------------------------------------------------------------------------
 
-void Drawing::saveCorrespondenceImage(const std::string &filename, 
+void Drawing::saveCorrespondenceImage(const std::string &filename,
     const cv::Mat &im1,
     const cv::Mat &im2, const std::vector<cv::KeyPoint> &kp1,
     const std::vector<cv::KeyPoint> &kp2,
@@ -98,13 +98,13 @@ void Drawing::drawCorrespondences(cv::Mat &image, const cv::Mat &img1,
 {
   int rows = img1.rows + img2.rows;
   int cols = (img1.cols > img2.cols ? img1.cols : img2.cols);
-  
+
   cv::Mat aux1, aux2;
   if(img1.channels() > 1)
     cv::cvtColor(img1, aux1, CV_RGB2GRAY);
   else
     aux1 = img1.clone();
-  
+
   if(img2.channels() > 1)
     cv::cvtColor(img2, aux2, CV_RGB2GRAY);
   else
@@ -122,41 +122,41 @@ void Drawing::drawCorrespondences(cv::Mat &image, const cv::Mat &img1,
   roi.y = 0;
   roi.width = img1.cols;
   roi.height = img1.rows;
-	
+
   cvSetImageROI(ipl_ret, roi);
   IplImage ipl_aux1 = IplImage(aux1);
-  cvCopyImage(&ipl_aux1, ipl_ret);
-  
+  cvCopy(&ipl_aux1, ipl_ret);
+
   roi.x = 0;
   roi.y = img1.rows;
   roi.width = img2.cols;
   roi.height = img2.rows;
-	
+
   cvSetImageROI(ipl_ret, roi);
   IplImage ipl_aux2 = IplImage(aux2);
-  cvCopyImage(&ipl_aux2, ipl_ret);
+  cvCopy(&ipl_aux2, ipl_ret);
 
-	cvResetImageROI(ipl_ret);
+    cvResetImageROI(ipl_ret);
 
-	// draw correspondences
-	cv::cvtColor(im, image, CV_GRAY2RGB);
-	
-	for(unsigned int i = 0; i < c1.size(); ++i)
-	{
-	  int mx = (int)kp1[ c1[i] ].pt.x;
-	  int my = (int)kp1[ c1[i] ].pt.y;
-	  int px = (int)kp2[ c2[i] ].pt.x;
-	  int py = (int)kp2[ c2[i] ].pt.y;
-	  
-	  py += img1.rows;
-	  
-    CvScalar color = cvScalar( 
+    // draw correspondences
+    cv::cvtColor(im, image, CV_GRAY2RGB);
+
+    for(unsigned int i = 0; i < c1.size(); ++i)
+    {
+      int mx = (int)kp1[ c1[i] ].pt.x;
+      int my = (int)kp1[ c1[i] ].pt.y;
+      int px = (int)kp2[ c2[i] ].pt.x;
+      int py = (int)kp2[ c2[i] ].pt.y;
+
+      py += img1.rows;
+
+    CvScalar color = cvScalar(
       int(((double)rand()/((double)RAND_MAX + 1.0)) * 256.0),
       int(((double)rand()/((double)RAND_MAX + 1.0)) * 256.0),
       int(((double)rand()/((double)RAND_MAX + 1.0)) * 256.0));
 
     cv::line(image, cvPoint(mx, my), cvPoint(px, py), color, 1);
-	}
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -166,7 +166,7 @@ void Drawing::drawReferenceSystem(cv::Mat &image, const cv::Mat &cTo,
 {
   const cv::Mat cRo(cTo, cv::Range(0,3), cv::Range(0,3));
   cv::Mat cto = cTo(cv::Range(0,3), cv::Range(3,4)).clone();
-  
+
   if(cTo.type() == CV_32F)
   {
     cto.at<float>(0,0) /= cTo.at<float>(3,3);
@@ -179,10 +179,10 @@ void Drawing::drawReferenceSystem(cv::Mat &image, const cv::Mat &cTo,
     cto.at<double>(1,0) /= cTo.at<double>(3,3);
     cto.at<double>(2,0) /= cTo.at<double>(3,3);
   }
-  
+
   Drawing::drawReferenceSystem(image, cRo, cto, A, K, length);
 }
-    
+
 // ---------------------------------------------------------------------------
 
 void Drawing::drawReferenceSystem(cv::Mat &image, const cv::Mat &cRo,
@@ -203,10 +203,10 @@ void Drawing::drawReferenceSystem(cv::Mat &image, const cv::Mat &cRo,
 
   vector<cv::Point2f> points2d;
   cv::projectPoints(cv::Mat(oP), cRo, cto, A, k, points2d);
-  
+
   // draw axis
   CvScalar bluez, greeny, redx;
-  
+
   if(image.channels() == 3 )
   {
     bluez = cvScalar(255,0,0);
@@ -231,7 +231,7 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &cRo,
   const cv::Mat &cto, float width, float height,
   const cv::Mat &A, const cv::Mat &K,
   std::vector<cv::Point2f> *_box,
-  const Plot::Style &style) 
+  const Plot::Style &style)
 {
   vector<cv::Point2f> auxbox;
   vector<cv::Point2f>* pbox = (_box ? _box : &auxbox);
@@ -242,7 +242,7 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &cRo,
     k = cv::Mat::zeros(4,1, cRo.type());
   else
     k = K;
-  
+
   const float w = width / 2.f;
   const float h = height / 2.f;
   cv::Mat oBox = (cv::Mat_<float>(4,3) <<
@@ -250,13 +250,13 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &cRo,
      w, -h, 0,
      w,  h, 0,
     -w,  h, 0);
-  
+
   cv::projectPoints(oBox, cRo, cto, A, k, box);
 
-	cv::line(image, box[0], box[1], style.color, style.thickness);
-	cv::line(image, box[1], box[2], style.color, style.thickness);
-	cv::line(image, box[2], box[3], style.color, style.thickness);
-	cv::line(image, box[3], box[0], style.color, style.thickness);
+    cv::line(image, box[0], box[1], style.color, style.thickness);
+    cv::line(image, box[1], box[2], style.color, style.thickness);
+    cv::line(image, box[2], box[3], style.color, style.thickness);
+    cv::line(image, box[3], box[0], style.color, style.thickness);
 }
 
 // ---------------------------------------------------------------------------
@@ -267,7 +267,7 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &sHb, int cols, int rows,
   vector<cv::Point2f> auxbox;
   vector<cv::Point2f>* pbox = (_box ? _box : &auxbox);
   vector<cv::Point2f>& box = *pbox;
-  
+
   box.resize(4);
 
   cv::Mat P;
@@ -277,7 +277,7 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &sHb, int cols, int rows,
       0, cols, cols,    0,
       0,    0, rows, rows,
       1,    1,    1,    1);
-    
+
     for(short i = 0; i < 4; ++i)
     {
       box[i].x = P.at<float>(0,i) / P.at<float>(2,i);
@@ -290,7 +290,7 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &sHb, int cols, int rows,
       0, cols, cols,    0,
       0,    0, rows, rows,
       1,    1,    1,    1);
-    
+
     for(short i = 0; i < 4; ++i)
     {
       box[i].x = P.at<double>(0,i) / P.at<double>(2,i);
@@ -299,9 +299,9 @@ void Drawing::drawBox(cv::Mat &image, const cv::Mat &sHb, int cols, int rows,
   }
 
   cv::line(image, box[0], box[1], style.color, style.thickness);
-	cv::line(image, box[1], box[2], style.color, style.thickness);
-	cv::line(image, box[2], box[3], style.color, style.thickness);
-	cv::line(image, box[3], box[0], style.color, style.thickness);
+    cv::line(image, box[1], box[2], style.color, style.thickness);
+    cv::line(image, box[2], box[3], style.color, style.thickness);
+    cv::line(image, box[3], box[0], style.color, style.thickness);
 
 }
 
@@ -311,9 +311,9 @@ Drawing::Plot::Style::Style(char c, int _thickness)
 {
   int r, g, b;
   r = g = b = 0;
-  
+
   thickness = _thickness;
-  
+
   switch(c)
   {
     case 'b': b = 255; break;
@@ -325,22 +325,22 @@ Drawing::Plot::Style::Style(char c, int _thickness)
     case 'w': r = g = b = 255; break;
     default: break;
   }
-  
+
   color = cv::Scalar(b, g, r);
 }
 
 // ---------------------------------------------------------------------------
 
 Drawing::Plot::Style::Style(int _thickness, char c)
-{  
+{
   Drawing::Plot::Style(c, _thickness);
 }
 
 // ---------------------------------------------------------------------------
 
-Drawing::Plot::Plot(int rows, int cols, double minx, double maxx, 
+Drawing::Plot::Plot(int rows, int cols, double minx, double maxx,
   double miny, double maxy, int margin)
-{  
+{
   m_bg = cv::Scalar(255,255,255);
   m_margin = margin;
   m_canvas.create(rows, cols, CV_8UC3);
@@ -350,7 +350,7 @@ Drawing::Plot::Plot(int rows, int cols, double minx, double maxx,
 
 // ---------------------------------------------------------------------------
 
-void Drawing::Plot::create(int rows, int cols, 
+void Drawing::Plot::create(int rows, int cols,
   double minx, double maxx, double miny, double maxy, int margin)
 {
   m_margin = margin;
@@ -361,7 +361,7 @@ void Drawing::Plot::create(int rows, int cols,
 
 // ---------------------------------------------------------------------------
 
-void Drawing::Plot::create(int rows, int cols, 
+void Drawing::Plot::create(int rows, int cols,
   double minx, double maxx, double miny, double maxy)
 {
   m_canvas.create(rows, cols, CV_8UC3);
@@ -389,17 +389,17 @@ void Drawing::Plot::create(double minx, double maxx, double miny, double maxy)
 
 // ---------------------------------------------------------------------------
 
-void Drawing::Plot::setAxes(double minx, double maxx, double miny, double maxy, 
+void Drawing::Plot::setAxes(double minx, double maxx, double miny, double maxy,
   int margin)
-{    
+{
   m_cx = (minx + maxx) / 2;
   m_cy = (miny + maxy) / 2;
   double xdif = maxx - minx;
   double ydif = maxy - miny;
-  
+
   m_uppx = xdif / double(m_canvas.cols - m_margin*2); // units per pixel
   m_uppy = ydif / double(m_canvas.rows - m_margin*2);
-  
+
   // axis equal
   if(m_uppx > m_uppy)
     m_uppy = m_uppx;
@@ -410,12 +410,12 @@ void Drawing::Plot::setAxes(double minx, double maxx, double miny, double maxy,
 // ---------------------------------------------------------------------------
 
 
-void Drawing::Plot::line(double x1, double y1, double x2, double y2, 
+void Drawing::Plot::line(double x1, double y1, double x2, double y2,
   const Style &style)
 {
   cv::Point a(toPxX(x1), toPxY(y1));
   cv::Point b(toPxX(x2), toPxY(y2));
-    
+
   cv::line(m_canvas, a, b, style.color, style.thickness);
 }
 

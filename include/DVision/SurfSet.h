@@ -21,7 +21,7 @@
 // https://code.ros.org/trac/opencv/ticket/825 )
 #define USURF_SUPPORTED 0
 
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <opencv/highgui.h>
 #include <vector>
 #include <string>
